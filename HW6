@@ -1,0 +1,49 @@
+import heapq
+from collections import Counter
+
+def freq(st):
+    dict_count = {}
+    for i in st:
+        if i in dict_count:
+            dict_count[i] += 1
+        else:
+            dict_count[i] = 1
+    return dict_count
+
+def Huffman_code(st):
+	# Step 1: Count frequency of each character
+    dict_count = freq(st)
+
+	# Step 2: Create a min-heap of (freq, [char, left, right])
+    heap = []
+	for key in dict_count:
+    	heapq.heappush(heap, (dict_count[key], [key, None, None]))  # leaf node: [char, None, None]
+
+	# Step 3: Build the Huffman tree
+	while len(heap) > 1:
+    	f1, node1 = heapq.heappop(heap)
+    	f2, node2 = heapq.heappop(heap)
+    	merged = [None, node1, node2]  # internal node
+    	heapq.heappush(heap, (f1 + f2, merged))
+
+	# Step 4: Traverse the tree and assign codes
+	_, root = heap[0]
+	codes = {}
+
+	def dfs(node, code):
+    	if node[0] is not None:  # leaf node
+        	codes[node[0]] = code
+    	else:
+        	dfs(node[1], code + "0")  # left = 0
+        	dfs(node[2], code + "1")  # right = 1
+
+	dfs(root, "")
+
+	# Step 5: Print Huffman codes
+	print("Huffman Codes:")
+	for char in sorted(codes):
+    	print(f"'{char}': {codes[char]}")
+
+	return codes
+
+print(freq("abcdaaabbc"))

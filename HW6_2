@@ -1,0 +1,103 @@
+import heapq
+from collections import Counter
+
+
+t = "abbcccdddd"
+# a) frequency_table(st)
+# Input:
+def frequency_table(st):
+    d = {}
+    for c in st:
+        if c in d:
+            d[c] += 1
+        else:
+            d[c] = 1
+    
+    for elem in d:
+        print(str(elem) + ' : ' + str(d[elem]))
+
+    return d
+
+#frequency_table(t)
+# Output:
+# Character Frequencies:
+# 'a': 1
+# 'b': 2
+# 'c': 3
+# 'd': 4
+
+# b) Huffman_code(st)
+def Huffman_code(st):
+    freq = frequency_table(st)
+
+    h = []
+
+    i = 0
+    for c in freq:
+        heapq.heappush(h, (freq[c], i, [c, None, None]))
+        i+= 1
+
+
+    
+    while len(h) > 1:
+        freq1, c1, n1 = heapq.heappop(h)
+        freq2, c2, n2 = heapq.heappop(h)
+        m = [None, n1, n2]
+        heapq.heappush(h, (freq1 + freq2, i, m))
+        i += 1
+
+    tempFreq, tempID, root = h[0]
+    codes = {}
+
+    def dfs(node, currCode):
+        if node[0] is not None:
+            codes[node[0]] = currCode
+        else:
+            dfs(node[1], currCode + '0')
+            dfs(node[2], currCode + '1')
+
+    dfs(root, '')
+
+    for char in sorted(codes):
+        print(char + ':' + codes[char])
+
+    return codes
+
+
+# Output:
+# Huffman Codes:
+# 'a': 000
+# 'b': 001
+# 'c': 01
+# 'd': 1
+
+def Huffman_encodes(st, codes):
+    new_st = ""
+    for i in st:
+        new_st += codes[i]
+    print(new_st)
+
+class Node:
+    def __init__(self):
+        self.left = None
+        self.right = None
+        self.char = None  # Leaf nodes will have characters
+
+def Huffman_tree(codes):
+    root = Node()
+    for char, code in codes.items():
+        current = root
+        for bit in code:
+            if bit == '0':
+                if current.left is None:
+                    current.left = Node()
+                current = current.left
+            else:  # bit == '1'
+                if current.right is None:
+                    current.right = Node()
+                current = current.right
+        current.char = char  # assign character to leaf
+    return root
+
+print(Huffman_tree(Huffman_code(t)))
+
